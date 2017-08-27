@@ -272,6 +272,189 @@
 	</p>
 </section>
 
+<section>
+	<h1>Concurrence</h1>
+	<p class="fragment">Un processus/thread est plus léger que plusieurs.</p>
+	<p class="fragment">Dans Node.js, tout est asynchrone : <i>callbacks</i></p>
+	<h2 class="fragment">Problèmes</h2>
+	<ul>
+		<li class="fragment">
+			<code>try</code>/<code>catch</code> ne fonctionne plus
+			<ul>
+				<li class="fragment">
+					Emballage des erreurs (<code>`Error</code>)
+				</li>
+			</ul>
+		</li>
+		<li class="fragment">
+			Imbrication trop importante (cascade qui devient vite illisible,
+			on parle parfois de <i>callback hell</i>)
+		</li>
+	</ul>
+</section>
+
+<!-- FIXME <, > in Mathjax? -->
+<section>
+	<h1>Monade</h1>
+	<ul>
+		<li class="fragment">
+			<code>return</code> : \(\alpha \mapsto \alpha m\)
+		</li>
+		<li class="fragment">
+			<code>>>= </code> (<code>bind</code>) :
+				\(\alpha m \mapsto \left(\alpha \mapsto \beta m\right)
+				\mapsto \beta m\)
+		</li>
+		<li class="fragment">
+			<i>Identité</i> :
+			$$\forall x, \forall f, \texttt{(return x >>= f) = f x}$$
+			$$\forall m, \texttt{(m >>= (fun x -> return x)) = m}$$
+		</li>
+		<li class="fragment">
+			<i>Associativité</i> : \(\forall m, \forall n, \forall o\)
+			(\(o\) sans variable libre \(a\))
+			$$\texttt{m >>= (fun a -> (n >>= fun b -> o))} =$$
+			$$\texttt{(m >>= fun a -> n) >>= fun b -> o}$$
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Promesses</h1>
+	<p class="fragment">
+		Pipeline, séquence de transformations avec <code>bind</code>.
+	</p>
+	<p class="fragment">
+		En OCaml, les fonctions restent imbriquées mais la syntaxe n'impose pas
+		l'utilisation de parenthèses. Les variables sont partagées
+		grâce à des <i>closures</i>.
+	</p>
+	<p class="fragment">
+		Le type d'une fonction exprime qu'elle est asynchrone, sa valeur de
+		retour est &laquo;&nbsp;emballée&nbsp;&raquo; :
+		<code>int -&gt; int t</code>
+	</p>
+</section>
+
+<section>
+	<h1>Exemple</h1>
+	<p><code>Lwt</code> implémente ces promesses.</p>
+	<!-- FIXME don't center! -->
+	<code>
+		open Lwt.Infix<br>
+		(* ... *)<br>
+		read_book title<br>
+		&gt;&gt;= translate ~dest:"fr"<br>
+		&gt;&gt;= Views.translation<br>
+		&gt;&gt;= respond ~status:`OK
+	</code>
+</section>
+
+<section>
+	<h1>Erreurs</h1>
+	<p>
+		En introduisant des variants polymorphes,
+		on peut garantir que toutes les erreurs seront gérées.
+	</p>
+	<h2>Exemple amélioré</h2>
+	<code>
+		open Error<br>
+		(* ... *)<br>
+		read_book title<br>
+		&gt;&gt;= translate ~dest:"fr"<br>
+		&gt;&gt;= Views.translation
+	</code>
+</section>
+
+<section>
+	<h1>Formulaires</h1>
+	<!-- FIXME définition... -->
+	<div class="fragment">
+		<p>
+			Un GADT permet de garder le type à l'exécution et
+			d'en sortir la valeur grâce à une fonction polymorphe :
+		</p>
+		<code>
+			type α typ =<br>
+			&nbsp;&nbsp;| Int: int -&gt; int t<br>
+			&nbsp;&nbsp;| Str: string -&gt; string t
+		</code>
+	</div>
+	<div class="fragment">
+		<p>La valeur et son type sont gardés en cas d'erreur :</p>
+		<code>
+			type (α, β) t =<br>
+			&nbsp;&nbsp;| Valid of α<br>
+			&nbsp;&nbsp;| Invalid of α * β
+		</code>
+	</div>
+</section>
+
+<section>
+	<h1>Formulaires (2)</h1>
+	<ul>
+		<li class="fragment">
+			<code>read </code> lit une<code>&nbsp;string option</code>
+		</li>
+		<li class="fragment">
+			<code>required </code> rend une valeur obligatoire
+		</li>
+		<li class="fragment">
+			<code>to_int</code> convertit en entier,
+			<code>min</code> teste une borne :<br>
+			<code>read uri "age" |&gt; to_int |&gt; min 5</code>
+		</li>
+		<li class="fragment">
+			<code>input</code> génère le champ HTML correspondant
+		</li>
+		<li class="fragment">
+			<code>get</code> donne la valeur OCaml correspondant :<br>
+			<code>let bio = read uri "bio" |&gt; get in</code>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Aller plus loin</h1>
+	<ul>
+		<li>
+			<code>do</code> à la Haskell pour que le code soit aussi facile à
+			écrire que de l'impératif, sans l'être. Les <i>modular
+			implicits</i> semblent être nécessaires.
+		</li>
+		<li>
+			Liens typés : créer une valeur dont le type contient les paramètres
+			du liens et l'utiliser à la fois pour le routage et la génération
+			du code HTML.
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Eliom</h1>
+	<!-- typo? -->
+	<!-- TODO logo? -->
+	<p>
+		Eliom (principalement maintenu par BeSport) est un framework assez
+		abouti qui répond à nos objectifs.
+		En outre, il compile le code OCaml en JavaScript afin d'exécuter
+		côté client du code type-safe et de ne plus avoir qu'un langage à
+		maîtriser.
+	</p>
+	<p>J'y fais mon stage !</p>
+</section>
+
+<section>
+	<h1>Des questions ?</h1>
+	<p>
+		Cette présentation est sur GitHub :<br>
+		<!-- FIXME? -->
+		<a href="https://ghuysmans.github.io/web-ocaml/index.html">
+		https://ghuysmans.github.io/web-ocaml/index.html
+		</a>
+	</p>
+</section>
+
 			</div>
 		</div>
 
@@ -288,7 +471,8 @@
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/math/math.js', async: true }
 				]
 			});
 		</script>
