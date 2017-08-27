@@ -24,8 +24,242 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+<section>
+	<h1>Développement Web en OCaml</h1>
+	Guillaume Huysmans, 2017
+</section>
+
+<section>
+	<h1>Langages Web</h1>
+	<ul>
+		<li>
+			Scripting
+			<ul>
+				<li class="fragment">PHP : très utilisé</li>
+				<li class="fragment">
+					Serveurs
+					<ul>
+						<li class="fragment">Node.js : asynchrone</li>
+						<li class="fragment">Ruby : tooling important</li>
+						<li class="fragment"><i>etc.</i></li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+		<li>
+			Langages compilés
+			<!-- FIXME source ? -->
+			<span class="fragment">(moins populaires)</span>
+			<ul>
+				<li class="fragment">Java : parfois considéré lourd</li>
+				<li class="fragment">VB, C#... (.NET)</li>
+			</ul>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Scripting</h1>
+	<ul>
+		<li class="fragment">
+			<s>Vitesse</s>
+			<span class="fragment">(réseau &gt;)</span>
+		</li>
+		<li class="fragment">
+			Typage dynamique
+			<ul>
+				<li class="fragment">
+					&laquo;&nbsp;Moins à écrire qu'en Java,
+					même résultat&nbsp;&raquo;
+				</li>
+				<li class="fragment">
+					Pas d'exécution (pas de test), pas d'erreur...
+				</li>
+				<li class="fragment">
+					Initiatives comme TypeScript, Dart, Haxe...
+					<ul>
+						<li class="fragment">À nouveau trop à écrire !</li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Objectifs</h1>
+	<p>Aider au maximum le programmeur à la compilation !</p>
+	<ul>
+		<li class="fragment">Cohérence formulaires/données</li>
+		<li class="fragment">
+			Gestion d'erreurs
+			<ul>
+				<li class="fragment">
+					sans <code>null</code> potentiellement inattendu
+				</li>
+				<li class="fragment">
+					exhaustive
+					<i class="fragment">(checked exceptions ?)</i>
+				</li>
+				<li class="fragment">
+					non intrusive
+					<span class="fragment">: pas de pages d'erreur partout</span>
+				</li>
+			</ul>
+		</li>
+		<li class="fragment">
+			Pages valides
+			<span class="fragment">(rendu plus cohérent)</span>
+		</li>
+		<li class="fragment">
+			Liens internes corrects
+			<ul>
+				<li class="fragment">ni morts (nouvelle version, etc.)</li>
+				<li class="fragment">ni invalides (mauvais paramètres...)</li>
+			</ul>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>OCaml</h1>
+	<h2>Typage</h2>
+	<ul>
+		<li class="fragment">
+			<i>statique</i> : fait à la compilation,
+			rien à l'exécution
+		</li>
+		<li class="fragment">
+			<i>fort</i> : pas de conversions implicites,
+			2 + 4.0 = erreur
+		</li>
+		<li class="fragment">
+			<i>inféré</i>
+			<ul>
+				<li class="fragment">Il ne faut pas écrire tous les types.</li>
+				<li class="fragment">Fonctionne avec le polymorphisme !</li>
+			</ul>
+		</li>
+		<!--
+		<li class="fragment">vachement puissant</li>
+		-->
+	</ul>
+</section>
+
+<section>
+	<h1>Types monomorphes</h1>
+	<ul>
+		<li class="fragment"><code>int</code></li>
+		<li class="fragment"><code>string</code></li>
+		<li class="fragment"><code>float -&gt; int </code></li>
+	</ul>
+	<p class="fragment">Le <i>currying</i> permet l'application partielle :</p>
+	<ul>
+		<li class="fragment"><code>date -&gt; date -&gt; int</code></li>
+		<li class="fragment"><code>date -&gt; (date -&gt; int)</code></li>
+		<li class="fragment">
+			<code>int * int -&gt; int * int -&gt; int</code>
+		</li>
+	</ul>
+</section>
+<section>
+	<h1>Types paramétriques</h1>
+	<p>Un paramètre parfois caché permet le polymorphisme.</p>
+	<ul>
+		<li class="fragment">
+			<code>α -&gt; α </code>
+			<span class="fragment">(l'identité associe à toute valeur
+				de type α la même valeur, le &laquo;&nbsp;pour tout&nbsp;&raquo;
+				est implicite)</span>
+		</li>
+		<li class="fragment">
+			<code>α list </code>
+			<span class="fragment">(liste chaînée d'α)</span>
+		</li>
+		<li class="fragment">
+			<code>α option </code>
+			<span class="fragment">
+				(soit <code>None</code>, soit <code>Some</code> α)
+			</span>
+		</li>
+		<li class="fragment">
+			<code>[&lt; `OK of string | `Not_found] list</code>
+			<span class="fragment"><br>
+				(des <code>`OK _ </code>,
+				des <code>`Not_found</code>,
+				ou un mélange)
+			</span>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>Valeurs</h1>
+	<ul>
+		<li class="fragment">
+			<code>42 </code>
+			<span class="fragment">(<code>int</code>)</span>
+		</li>
+		<li class="fragment">
+			<code>[] </code>
+			<span class="fragment">(constructeur d'α <code>list</code>)</span>
+		</li>
+		<li class="fragment">
+			<code>fun x -> x+1 </code>
+			<span class="fragment">(<code>int -&gt; int</code>)</span>
+		</li>
+
+		<p class="fragment">
+			Les variants polymorphes peuvent typer du HTML
+			<span class="fragment">,
+				voici ce que produit <code>Tyxml</code> :<br>
+				<code>
+				`Ul [<br>
+					&nbsp;&nbsp;`Li [`PCDATA "math"];<br>
+					&nbsp;&nbsp;`Li [`PCDATA "info"]<br>
+				]
+				</code>
+			</span>
+		</p>
+	</ul>
+</section>
+
+<section>
+	<h1>Module</h1>
+	<p>Un module regroupe :</p>
+	<ul>
+		<li class="fragment">des types</li>
+		<li class="fragment">des fonctions</li>
+		<li class="fragment">des sous-modules</li>
+		<li class="fragment">des foncteurs <i>(pas abordés)</i></li>
+	</ul>
+	<p class="fragment">
+		Une interface (ensemble de signatures) permet de
+		restreindre les types <i>(encapsulation)</i>.
+	</p>
+</section>
+
+<section>
+	<h1>Exemple</h1>
+	<p>Ne pas confondre un identifiant avec un nombre.</p>
+	<table>
+		<tr><td>id.mli</td><td><code>
+			type t<br>
+			val make: int -&gt; t<br>
+			val to_int: t -&gt; int<br>
+		</td></tr></code>
+		<tr><td>id.ml</td><td><code>
+			type t = int<br>
+			let make n = n<br>
+			let to_int n = n<br>
+		</td></tr></code>
+	</table>
+	<p>
+		En dehors d'<code>id.ml</code>,
+		<code>t</code> est <i>opaque</i> donc <code>t≠int</code>.
+	</p>
+</section>
+
 			</div>
 		</div>
 
