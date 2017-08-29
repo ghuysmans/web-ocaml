@@ -224,17 +224,17 @@
 		</li>
 
 		<p class="fragment">
-			Les variants polymorphes peuvent typer du HTML
-			<span class="fragment">,
-				voici ce que produit <code>Tyxml</code> :<br>
-				<code>
-				`Ul [<br>
-					&nbsp;&nbsp;`Li [`PCDATA "math"];<br>
-					&nbsp;&nbsp;`Li [`PCDATA "info"]<br>
-				]
-				</code>
-			</span>
+			Les variants polymorphes peuvent typer du HTML.
 		</p>
+		<div class="fragment">
+			<p>Voici ce que produit <code>Tyxml</code> :</p>
+			<pre><code data-trim>
+`Ul [
+  `Li [`PCDATA "math"];
+  `Li [`PCDATA "info"]
+]
+			</code></pre>
+		</div>
 	</ul>
 </section>
 
@@ -259,21 +259,20 @@
 <section>
 	<h1>Exemple : id</h1>
 	<p>Rendre explicite toute conversion <code>int</code> ↔ id.</p>
-	<table>
-		<tr><td>id.mli</td><td><code>
-			type t<br>
-			val make: int -&gt; t<br>
-			val to_int: t -&gt; int<br>
-		</td></tr></code>
-		<tr><td>id.ml</td><td><code>
-			type t = int<br>
-			let make n = n<br>
-			let to_int n = n<br>
-		</td></tr></code>
-	</table>
+	<pre><code>
+(* id.mli *)
+type t
+val make: int -> t
+val to_int: t -> int
+
+(* id.ml *)
+type t = int
+let make n = n
+let to_int n = n
+	</code></pre>
 	<p>
 		En dehors d'<code>id.ml</code>,
-		<code>t</code> est <i>opaque</i> donc <code>t≠int</code>.
+		<code>t</code> est <i>opaque</i>, donc <code>t≠int</code>.
 	</p>
 </section>
 
@@ -344,15 +343,14 @@
 <section>
 	<h1>Exemple</h1>
 	<p><code>Lwt</code> implémente ces promesses.</p>
-	<!-- FIXME don't center! -->
-	<code>
-		open Lwt.Infix<br>
-		(* ... *)<br>
-		read_book title<br>
-		&gt;&gt;= translate ~dest:"fr"<br>
-		&gt;&gt;= Views.translation<br>
-		&gt;&gt;= respond ~status:`OK
-	</code>
+	<pre><code>
+open Lwt.Infix
+(* ... *)
+read_book title
+>>= translate ~dest:"fr"
+>>= Views.translation
+>>= respond ~status:`OK
+	</code></pre>
 </section>
 
 <section>
@@ -362,13 +360,13 @@
 		on peut garantir que toutes les erreurs seront gérées.
 	</p>
 	<h2>Exemple amélioré</h2>
-	<code>
-		open Error<br>
-		(* ... *)<br>
-		read_book title<br>
-		&gt;&gt;= translate ~dest:"fr"<br>
-		&gt;&gt;= Views.translation
-	</code>
+	<pre><code>
+open Error
+(* ... *)
+read_book title
+>>= translate ~dest:"fr"
+>>= Views.translation
+	</code></pre>
 </section>
 
 <section>
@@ -379,19 +377,19 @@
 			Un GADT permet de garder le type à l'exécution et
 			d'en sortir la valeur grâce à une fonction polymorphe :
 		</p>
-		<code>
-			type α typ =<br>
-			&nbsp;&nbsp;| Int: int -&gt; int typ<br>
-			&nbsp;&nbsp;| Str: string -&gt; string typ
-		</code>
+		<pre><code>
+type α typ =
+  | Int: int -> int typ
+  | Str: string -> string typ
+		</code></code>
 	</div>
 	<div class="fragment">
 		<p>La valeur et son type sont gardés en cas d'erreur :</p>
-		<code>
-			type (α, β) t =<br>
-			&nbsp;&nbsp;| Valid of α<br>
-			&nbsp;&nbsp;| Invalid of α * β
-		</code>
+		<pre><code>
+type (α, β) t =
+  | Valid of α
+  | Invalid of α * β
+		</code></pre>
 	</div>
 </section>
 
