@@ -151,7 +151,7 @@
 	</ul>
 	<p class="fragment">
 		Le compilateur construit une preuve logique,
-		cf. correspondance de Curry-Howard.
+		cf.&nbsp;correspondance de Curry-Howard.
 	</p>
 </section>
 
@@ -279,7 +279,7 @@ let to_int n = n
 <section>
 	<h1>Concurrence</h1>
 	<p class="fragment">Un processus/thread est plus léger que plusieurs.</p>
-	<p class="fragment">Dans Node.js, tout est asynchrone : <i>callbacks</i></p>
+	<p class="fragment">En Node.js, asynchrone \(\implies\) <i>callback</i>.</p>
 	<h2 class="fragment">Problèmes</h2>
 	<ul>
 		<li class="fragment">
@@ -366,6 +366,7 @@ open Error
 read_book title
 >>= translate ~dest:"fr"
 >>= Views.translation
+>>! handle_errors
 	</code></pre>
 </section>
 
@@ -411,7 +412,7 @@ type (α, β) t =
 			<code>input</code> génère le champ HTML correspondant
 		</li>
 		<li class="fragment">
-			<code>get</code> donne la valeur OCaml correspondant :<br>
+			<code>get</code> donne la valeur OCaml correspondante :<br>
 			<code>let bio = read uri "bio" |&gt; get in</code>
 		</li>
 	</ul>
@@ -442,7 +443,7 @@ type (α, β) t =
 		</li>
 		<li>
 			Liens typés : créer une valeur dont le type contient les paramètres
-			du liens et l'utiliser à la fois pour le routage et la génération
+			du lien et l'utiliser à la fois pour le routage et la génération
 			du code HTML.
 		</li>
 		<li>
