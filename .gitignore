@@ -1,0 +1,6 @@
+*.byte
+*.native
+_tags
+_build/
+
+*.swp
