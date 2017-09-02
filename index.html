@@ -12,6 +12,15 @@
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
+		<style>
+		tr.pics {
+			background-color: white;
+		}
+		tr.pics img {
+			box-shadow: none;
+		}
+		</style>
+
 		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
@@ -25,39 +34,11 @@
 		<!-- FIXME up/down too! -->
 		<div class="reveal">
 			<div class="slides">
+
 <section>
 	<h1>Développement Web en OCaml</h1>
 	<p>Guillaume Huysmans, 2017</p>
 	<p>UMONS, Département d'informatique</p>
-</section>
-
-<section>
-	<h1>Langages Web</h1>
-	<ul>
-		<li>
-			Scripting
-			<ul>
-				<li class="fragment">PHP : très utilisé</li>
-				<li class="fragment">
-					Serveurs
-					<ul>
-						<li class="fragment">Node.js : asynchrone</li>
-						<li class="fragment">Ruby : tooling important</li>
-						<li class="fragment"><i>etc.</i></li>
-					</ul>
-				</li>
-			</ul>
-		</li>
-		<li>
-			Langages compilés
-			<!-- FIXME source ? -->
-			<span class="fragment">(moins populaires)</span>
-			<ul>
-				<li class="fragment">Java : parfois considéré lourd</li>
-				<li class="fragment">VB, C#... (.NET)</li>
-			</ul>
-		</li>
-	</ul>
 </section>
 
 <section>
@@ -80,12 +61,27 @@
 					Pas d'exécution (pas de test), pas d'erreur...
 				</li>
 				<li class="fragment">
-					Initiatives comme TypeScript, Dart, Haxe...
+					Retour vers du typage statique avec TypeScript
 					<ul>
-						<li class="fragment">À nouveau trop à écrire !</li>
+						<li class="fragment">
+							À nouveau trop à écrire (bibliothèques...) !
+						</li>
 					</ul>
 				</li>
 			</ul>
+		</li>
+	</ul>
+</section>
+
+<section>
+	<h1>À éviter</h1>
+	<ul>
+		<li class="fragment">
+			Débogage complexe, erreurs &laquo;&nbsp;prévisibles&nbsp;&raquo; :
+			<pre><code>TypeError: null has no properties</code></pre>
+		</li>
+		<li class="fragment">
+			Constante qui change, formule incorrecte
 		</li>
 	</ul>
 </section>
@@ -106,19 +102,17 @@
 					<i class="fragment">(checked exceptions ?)</i>
 				</li>
 				<li class="fragment">
+					<!-- une raison. L'autre : inféré donc pas gênant -->
 					non intrusive
 					<span class="fragment">: isolation lib/Web</span>
 				</li>
 			</ul>
 		</li>
 		<li class="fragment">
-			Pages valides W3C
-			<span class="fragment">(rendu plus cohérent)</span>
-		</li>
-		<li class="fragment">
-			Liens internes corrects
+			Pages valides W3C :
 			<ul>
-				<li class="fragment">ni morts, ni invalides (paramètres...)</li>
+				<li class="fragment">Rendu plus cohérent</li>
+				<li class="fragment">Accessibilité</li>
 			</ul>
 		</li>
 	</ul>
@@ -142,17 +136,13 @@
 				<li class="fragment">
 					Il n'est pas nécessaire d'écrire tous les types.
 				</li>
-				<li class="fragment">Fonctionne avec le polymorphisme !</li>
+				<li class="fragment">Polymorphisme paramétrique !</li>
 			</ul>
 		</li>
 		<!--
 		<li class="fragment">vachement puissant</li>
 		-->
 	</ul>
-	<p class="fragment">
-		Le compilateur construit une preuve logique,
-		cf.&nbsp;correspondance de Curry-Howard.
-	</p>
 </section>
 
 <section>
@@ -162,81 +152,82 @@
 		<li class="fragment"><code>string</code></li>
 		<li class="fragment"><code>float -&gt; int </code></li>
 	</ul>
-	<p class="fragment">Le <i>currying</i> permet l'application partielle :</p>
-	<ul>
-		<li class="fragment">
-			<code>date * date -&gt; int </code> (sans currying)
-		</li>
-		<li class="fragment">
-			<code>date -&gt; (date -&gt; int)</code>
-			<span class="fragment">
-				<code>=<br>date -&gt; date -&gt; int </code>
-				(associativité à droite)
-			</span>
-		</li>
-	</ul>
 </section>
 <section>
 	<h1>Types paramétriques</h1>
-	<p>Un paramètre parfois caché permet le polymorphisme.</p>
 	<ul>
 		<li class="fragment">
-			<code>α -&gt; α </code>
-			<span class="fragment">(l'identité associe à toute valeur
-				de type α la même valeur, le &laquo;&nbsp;pour tout&nbsp;&raquo;
-				est implicite)</span>
+			<code>α list </code> (liste chaînée d'α),
+			par ex. <code>[1; 2; 3]</code>
 		</li>
 		<li class="fragment">
-			<code>α list </code>
-			<span class="fragment">(liste chaînée d'α)</span>
+			<code>α option</code>
+			<ul>
+				<li class="fragment">
+					Soit <i>rien</i> : <code>None </code>
+					(de type <code> α option</code>)
+				</li>
+				<li class="fragment">
+					Soit une valeur : <code>Some 2 </code>
+					(de type <code> int option</code>)
+				</li>
+			</ul>
 		</li>
 		<li class="fragment">
-			<code>α option </code>
-			<span class="fragment">
-				(soit <code>None</code>, soit <code>Some</code> α)
-			</span>
-		</li>
-		<li class="fragment">
-			<code>[&lt; `OK of string | `Not_found] list</code>
-			<span class="fragment"><br>
-				(des <code>`OK _ </code>,
-				des <code>`Not_found</code>,
-				ou un mélange)
-			</span>
+			<code>[&lt; `OK | `Not_found] </code> : variant polymorphe
+			<ul>
+				<li class="fragment">
+					Sous-type de <code>[`OK | `Not_found]</code>
+				</li>
+				<li class="fragment">
+					<code>`OK</code>, <code>`Not_found </code> ou un des deux
+				</li>
+			</ul>
 		</li>
 	</ul>
 </section>
 
 <section>
-	<h1>First-class values</h1>
-	<ul>
-		<li class="fragment">
-			<code>42 </code>
-			<span class="fragment">(<code>int</code>)</span>
-		</li>
-		<li class="fragment">
-			<code>[] </code>
-			<span class="fragment">(constructeur d'α <code>list</code>)</span>
-		</li>
-		<li class="fragment">
-			<code>fun x -> x+1 </code>
-			<span class="fragment">(<code>int -&gt; int</code>)</span>
-		</li>
-
-		<p class="fragment">
-			Les variants polymorphes peuvent typer du HTML.
-		</p>
-		<div class="fragment">
-			<p>Voici ce que produit <code>Tyxml</code> :</p>
-			<pre><code data-trim>
-`Ul [
-  `Li [`PCDATA "math"];
-  `Li [`PCDATA "info"]
+	<h1>Tyxml</h1>
+	<pre><code data-trim>
+(* tyxml.mli simplifié *)
+type 'a elt
+val table :
+  (* ... *)
+  ?columns: [< `Colgroup] elt list ->
+  [< `Tr] elt list ->
+  [> `Table] elt
+(* utilisation *)
+type t = {name: string; age: int}
+let to_row x = tr [
+  td [pcdata x.name];
+  td [pcdata (string_of_int x.age)]
 ]
-			</code></pre>
-		</div>
-	</ul>
+let to_table l = table (List.map to_row l)
+	</code></pre>
 </section>
+
+<section>
+	<h1>Exemple d'erreur</h1>
+	<pre><code data-trim>
+let view l = [p ["Members:"; br (); to_table l]]
+	</code></pre>
+	<pre>
+Error: This expression has type
+  ([> Html_types.table ] as 'a) Tyxml.Html.elt = 'a Tyxml_html.elt
+but an expression was expected of type
+  ([< Html_types.p_content_fun ] as 'b) Tyxml.Html.elt =
+    'b Tyxml_html.elt
+Type 'a = [> `Table ] is not compatible with type
+  'b =
+    [< `A of Html_types.phrasing_without_interactive
+     | `Abbr
+     ... ]
+The second variant type does not allow tag(s) `Table
+	</pre>
+</section>
+<!-- FIXME autre slide avec erreur dont les mots-clés sont colorés -->
+<!-- TODO template par fonctions composées -->
 
 <section>
 	<h1>Module</h1>
@@ -252,7 +243,7 @@
 	</ul>
 	<p class="fragment">
 		Une interface (ensemble de signatures) permet de
-		restreindre les types <i>(encapsulation)</i>.
+		restreindre les types (par <i>abstraction</i>).
 	</p>
 </section>
 
@@ -261,7 +252,7 @@
 	<p>Rendre explicite toute conversion <code>int</code> ↔ id.</p>
 	<pre><code>
 (* id.mli *)
-type t
+type t (* abstrait, opaque *)
 val make: int -> t
 val to_int: t -> int
 
@@ -280,35 +271,54 @@ let to_int n = n
 	<h1>Concurrence</h1>
 	<p class="fragment">Un processus/thread est plus léger que plusieurs.</p>
 	<p class="fragment">En Node.js, asynchrone \(\implies\) <i>callback</i>.</p>
+	<p class="fragment">
+		Dans un serveur avec plusieurs clients,
+		un gestionnaire de requêtes qui attend
+		ne doit pas bloquer les autres.
+	</p>
 	<h2 class="fragment">Problèmes</h2>
 	<ul>
 		<li class="fragment">
 			<code>try</code>/<code>catch</code> ne fonctionne plus
-			<ul>
-				<li class="fragment">
-					Emballage des erreurs (<code>`Error</code>)
-				</li>
-			</ul>
 		</li>
-		<li class="fragment">
-			Imbrication trop importante (cascade qui devient vite illisible,
-			on parle parfois de <i>callback hell</i>)
-		</li>
+		<li class="fragment">Imbrication trop importante (syntaxe)</li>
 	</ul>
 </section>
 
-<!-- FIXME <, > in Mathjax? -->
 <section>
 	<h1>Monade</h1>
 	<ul>
 		<li class="fragment">
-			<code>return</code> : \(\alpha \mapsto \alpha m\)
+			<code>return</code> : \(\alpha \rightarrow \alpha m\)
 		</li>
 		<li class="fragment">
 			<code>>>= </code> (<code>bind</code>) :
-				\(\alpha m \mapsto \left(\alpha \mapsto \beta m\right)
-				\mapsto \beta m\)
+				\(\alpha m \rightarrow \left(\alpha \rightarrow \beta m\right)
+				\rightarrow \beta m\)
 		</li>
+	</ul>
+	<table class="fragment">
+		<tr>
+			<td><code>return</code></td>
+			<td></td>
+			<td><code>bind</code></td>
+		</tr>
+		<tr class="pics">
+			<td><img src="return.png"></td>
+			<td><img src="ouch.png"></td>
+			<td><img src="bind.png"></td>
+		</tr>
+		<tr>
+			<td align="right" colspan="3">
+				<small>
+					<a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">source</a> : Aditya Bhargava
+				</small>
+			</td>
+		</tr>
+	</table>
+	<p>
+	</p>
+		<!--
 		<li class="fragment">
 			<i>Identité</i> :
 			$$\forall x, \forall f, \texttt{(return x >>= f) = f x}$$
@@ -320,102 +330,85 @@ let to_int n = n
 			$$\texttt{m >>= (fun a -> (n >>= fun b -> o))} =$$
 			$$\texttt{(m >>= fun a -> n) >>= fun b -> o}$$
 		</li>
+		-->
 	</ul>
 </section>
 
 <section>
-	<h1>Promesses</h1>
+	<h1>Promesse</h1>
 	<p class="fragment">
-		Pipeline, séquence de transformations avec <code>bind</code>.
-	</p>
-	<p class="fragment">
-		En OCaml, les fonctions restent imbriquées mais la syntaxe n'impose pas
-		l'utilisation de parenthèses. Les variables sont partagées
-		grâce à des <i>closures</i>.
-	</p>
-	<p class="fragment">
-		Le type d'une fonction exprime qu'elle est asynchrone, sa valeur de
-		retour est &laquo;&nbsp;emballée&nbsp;&raquo; :
+		Valeur accessible plus tard, transformée avec <code>bind</code>.
+		Elle est &laquo;&nbsp;emballée&nbsp;&raquo; :
 		<code>int -&gt; int t</code>
+	</p>
+	<p class="fragment">
+		Le calcul progresse au fil de ces transformations.
 	</p>
 </section>
 
 <section>
 	<h1>Exemple</h1>
-	<p><code>Lwt</code> implémente ces promesses.</p>
-	<pre><code>
-open Lwt.Infix
-(* ... *)
-read_book title
->>= translate ~dest:"fr"
->>= Views.translation
->>= respond ~status:`OK
+	<pre><code class="ocaml" data-trim>
+(* sans Lwt *)
+let f title =
+  let s = read_book title in
+  let fr = translate ~dest:"fr" s in
+  let v = Views.book title fr in
+  resp_ok v
+
+(* avec Lwt *)
+let f title =
+  read_book title
+  >>= translate ~dest:"fr"
+  >>= Views.book title
+  >>= resp_ok
 	</code></pre>
 </section>
 
 <section>
 	<h1>Erreurs</h1>
 	<p>
-		En introduisant des variants polymorphes,
-		on peut garantir que toutes les erreurs seront gérées.
+		Avec des variants polymorphes,
+		les erreurs possibles seront accumulées dans le type.
 	</p>
-	<h2>Exemple amélioré</h2>
-	<pre><code>
-open Error
-(* ... *)
-read_book title
->>= translate ~dest:"fr"
->>= Views.translation
->>! handle_errors
-	</code></pre>
-</section>
-
-<section>
-	<h1>Formulaires</h1>
-	<!-- FIXME définition... -->
+	<p class="fragment">
+		Le combinateur <code>&gt;&gt;&gt;</code> transmet les erreurs
+		<!-- quand il n'y a pas de valeur à transformer -->
+		et <code>&gt;&gt;!</code> transforme ces erreurs (en pages, ici).
+	</p>
 	<div class="fragment">
-		<p>
-			Un GADT permet de garder le type à l'exécution et
-			d'en sortir la valeur grâce à une fonction polymorphe :
-		</p>
-		<pre><code>
-type α typ =
-  | Int: int -> int typ
-  | Str: string -> string typ
-		</code></code>
-	</div>
-	<div class="fragment">
-		<p>La valeur et son type sont gardés en cas d'erreur :</p>
-		<pre><code>
-type (α, β) t =
-  | Valid of α
-  | Invalid of α * β
+		<h2>Exemple amélioré</h2>
+		<pre><code class="ocaml" data-trim>
+let f title =
+  read_book title          (* (string, [< `NF]) t *)
+  >>> translate ~dest:"fr" (* (string, [< `NF, `CT] t *)
+  >>> Views.translation    (* (doc, [< `NF, `CT] t *)
+  >>! handle_errors        (* (doc, [< `Redir of string] t *)
 		</code></pre>
 	</div>
 </section>
 
 <section>
-	<h1>Formulaires (2)</h1>
-	<ul>
-		<li class="fragment">
-			<code>read </code> lit une<code>&nbsp;string option</code>
-		</li>
-		<li class="fragment">
-			<code>required </code> rend une valeur obligatoire
-		</li>
-		<li class="fragment">
-			<code>to_int</code> convertit en entier,
-			<code>min</code> teste une borne :<br>
-			<code>read uri "age" |&gt; to_int |&gt; min 5</code>
-		</li>
-		<li class="fragment">
-			<code>input</code> génère le champ HTML correspondant
-		</li>
-		<li class="fragment">
-			<code>get</code> donne la valeur OCaml correspondante :<br>
-			<code>let bio = read uri "bio" |&gt; get in</code>
-		</li>
-	</ul>
+	<h1>Formulaires</h1>
+	<p>
+		Le type des champs affichés doit correspondre à
+		celui des valeurs attendues par le programme.
+	</p>
+	<pre class="fragment"><code class="ocaml" data-trim>
+type t = {name: string; age: int option}
+let form ?(t = {name = ""; age = None}) () =
+  form `Post [
+    h2 [pcdata "Form"];
+    label "Name: " (make_string "name" t.name |> input);
+    label "Age: " (make_int_o "age" t.age |> input);
+    button [pcdata "Submit"];
+  ]
+let read data =
+  read data "name" |> required |> get >>> fun name ->
+  read data "age" |> to_int |> get >>> fun age ->
+  return {name; age} (* (t, [< `NaN | `Required]) Error.t *)
+	</code></pre>
+	<!-- TODO screenshot pour montrer l'interaction -->
 </section>
 
 <section>
@@ -423,7 +416,7 @@ type (α, β) t =
 	<ul>
 		<li class="fragment">
 			Les objectifs de fiabilité décrits au début sont atteignables grâce
-			au typage d'OCaml, les variants polymorphes et les GADT sont très
+			au typage d'OCaml; les variants polymorphes et les GADT sont très
 			utiles même si on ne les retrouve pas dans beaucoup de langages.
 		</li>
 		<li class="fragment">
@@ -436,49 +429,21 @@ type (α, β) t =
 <section>
 	<h1>Aller plus loin</h1>
 	<ul>
-		<li>
-			<code>do</code> à la Haskell pour que le code soit aussi facile à
-			écrire que de l'impératif, sans l'être. Les <i>modular
-			implicits</i> semblent être nécessaires.
-		</li>
-		<li>
-			Liens typés : créer une valeur dont le type contient les paramètres
-			du lien et l'utiliser à la fois pour le routage et la génération
-			du code HTML.
-		</li>
-		<li>
-			Types fantômes : ils ajoutent des contraintes à la compilation
-			sans jamais être instanciés.
-		</li>
-	</ul>
-</section>
-
-<section>
-	<h1><a href="https://github.com/ocsigen/eliom">Eliom</a></h1>
-	<!-- TODO logo? -->
-	<ul>
-		<li>
-			Framework maintenu par
-			<a href="https://besport.com">Be Sport</a> (mon stage !)
-		</li>
 		<li class="fragment">
-			Répond à nos objectifs (et plus encore)
+			Lien typé :
 			<ul>
-				<li class="fragment">
-					<a href="https://github.com/ocsigen/js_of_ocaml">
-					js_of_ocaml
-					</a>
-					compile du OCaml en JavaScript
-				</li>
+				<li>Valeur : URI</li>
+				<li>Paramètre de type : type des paramètres</li>
+				<li>Utilisé pour le routage et le rendu</li>
 			</ul>
 		</li>
+		<li class="fragment">
+			<a href="https://github.com/ocsigen/js_of_ocaml">
+			js_of_ocaml
+			</a>
+			compile du OCaml en JavaScript
+		</li>
 	</ul>
-	<blockquote class="fragment">
-		Un Anneau pour les gouverner tous<br>
-		Un Anneau pour les trouver<br>
-		Un Anneau pour les amener tous,<br>
-		Et dans les ténèbres les lier
-	</blockquote>
 </section>
 
 <section>
@@ -489,9 +454,8 @@ type (α, β) t =
 	<h1>Des questions ?</h1>
 	<p>
 		Cette présentation est sur GitHub :<br>
-		<!-- FIXME? -->
-		<a href="https://ghuysmans.github.io/web-ocaml/index.html">
-		https://ghuysmans.github.io/web-ocaml/index.html
+		<a href="https://ghuysmans.github.io/web-ocaml/">
+		https://ghuysmans.github.io/web-ocaml/
 		</a>
 	</p>
 	<p>
