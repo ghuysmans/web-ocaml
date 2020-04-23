@@ -4,7 +4,7 @@ open Error
 let view_invalid f _ =
   let open Tyxml.Html in
   (* FIXME use the second argument! *)
-  Template.template "Invalid field" [pcdata f]
+  Template.template "Invalid field" [txt f]
 
 let calc post =
   match post with

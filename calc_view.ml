@@ -5,11 +5,11 @@ let form i =
   let open Tyxml.Html in
   let open Form in
   form `Post [
-    h2 [pcdata "Form"];
+    h2 [txt "Form"];
     label "Name: " (make_string "name" o.name |> input);
     label "First number: " (make_int "first" o.first |> input);
     label "Second number: " (make_int_o "second" o.second |> input);
-    button [pcdata "Submit"];
+    button [txt "Submit"];
   ]
 
 let form t =
@@ -18,6 +18,6 @@ let form t =
 let result (n, r) =
   let open Tyxml.Html in
   Template.template "Average" [
-    h2 [pcdata "Result"];
-    p [pcdata @@ "Hi " ^ n ^ ". The answer is " ^ string_of_int r]
+    h2 [txt "Result"];
+    p [txt @@ "Hi " ^ n ^ ". The answer is " ^ string_of_int r]
   ]

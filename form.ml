@@ -160,7 +160,7 @@ let input ?label (x, {name}) =
       | Select (l, s) ->
         let options = List.map (fun (k, v) ->
           let a = if k = s then [a_selected ()] else [] in
-          option ~a (pcdata v)
+          option ~a (txt v)
         ) l in
         select ~a:[a_name name] options
       | Float f ->
@@ -173,11 +173,11 @@ let input ?label (x, {name}) =
           (match max with None -> [] | Some m -> [a_input_max (`Number m)]) in
         input ~a:([a_input_type `Number; a_value s] @ bounds @ attrs) ()
       | Text s ->
-        textarea ~a:attrs (pcdata s) in
+        textarea ~a:attrs (txt s) in
   output true value
 
 let label lbl control =
-  label [pcdata lbl; control]
+  label [txt lbl; control]
 
 let form meth content =
   form ~a:[a_method meth] content
