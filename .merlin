@@ -1,4 +1,0 @@
-B _build
-PKG cohttp
-PKG lwt
-PKG tyxml
