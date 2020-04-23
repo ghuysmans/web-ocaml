@@ -20,6 +20,7 @@ let app () =
   let id = Random.bits () in
   Printf.printf "started %d\n%!" id;
   get_list [] >>= fun l ->
+  await (Lwt_unix.sleep 1.0) >>= fun () ->
   return @@ Template.template "result" [
     p [txt (Printf.sprintf "id=%d" id)];
     ul (List.map (fun x -> li [txt x]) l);

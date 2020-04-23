@@ -1,3 +1,5 @@
+open Lwt.Infix
+
 let cont = Hashtbl.create 10
 
 let router _uri _headers post =
@@ -17,17 +19,21 @@ let router _uri _headers post =
           Hashtbl.remove cont k;
           f post
   in
-  let doc =
-    match t with
-    | Cont.Return doc -> doc
+  let respond doc =
+    let h = Cohttp.Header.init_with "Content-Type" "text/html" in
+    My_server.respond `OK h doc
+  in
+  let rec step = function
+    | Cont.Return doc -> respond doc
     | Ask (render, f) ->
       let id = Random.bits () in
       Hashtbl.replace cont id f;
       let url = string_of_int id in
-      render url
+      respond (render url)
+    | Await (lwt, f) ->
+      lwt >>= fun x -> step (f x)
   in
-  let h = Cohttp.Header.init_with "Content-Type" "text/html" in
-  My_server.respond `OK h doc
+  step t
 
 
 let () = Lwt_main.run (
