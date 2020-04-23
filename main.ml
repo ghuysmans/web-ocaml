@@ -1,38 +1,35 @@
-open Lwt.Infix
-open Error
-
-let view_invalid f _ =
-  let open Tyxml.Html in
-  (* FIXME use the second argument! *)
-  Template.template "Invalid field" [txt f]
-
-let calc post =
-  match post with
-  | None ->
-    let v = Calc_view.form None in
-    return (`Page v)
-  | Some p ->
-    Calc.read p >>> fun t ->
-    if t.Calc.first = 42 then
-      return (`Redirect "http://xkcd.com")
-    else
-      Calc.compute t
-      >|> Calc_view.result >|> fun v ->
-      `Page v
+let cont = Hashtbl.create 10
 
 let router _uri _headers post =
+  let t =
+    match post with
+    | None -> App.app ()
+    | Some post ->
+      match Uri.get_query_param post "k" with
+      | None ->
+        Cont.return (Template.template "error" [Tyxml.Html.txt "missing k"])
+      | Some k ->
+        let k = int_of_string k in
+        match Hashtbl.find_opt cont k with
+        | None ->
+          Cont.return (Template.template "error" [Tyxml.Html.txt "bad k"])
+        | Some f ->
+          Hashtbl.remove cont k;
+          f post
+  in
+  let doc =
+    match t with
+    | Cont.Return doc -> doc
+    | Ask (render, f) ->
+      let id = Random.bits () in
+      Hashtbl.replace cont id f;
+      let url = string_of_int id in
+      render url
+  in
   let h = Cohttp.Header.init_with "Content-Type" "text/html" in
-  calc post (* TODO routing here *)
-  >>! (function
-    | `Invalid (s, e) -> return (`Page (view_invalid s e))
-  )
-  |> get
-  >>= function
-    | `Page p -> My_server.respond `OK h p
-    | `Redirect r -> My_server.respond_redirect (Uri.of_string r) h ""
+  My_server.respond `OK h doc
 
 
-let () =
-  (
-    My_server.create (`TCP (`Port 8000)) router
-  ) |> Lwt_main.run
+let () = Lwt_main.run (
+  My_server.create (`TCP (`Port 8000)) router
+)
