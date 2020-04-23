@@ -20,7 +20,7 @@ let calc post =
       >|> Calc_view.result >|> fun v ->
       `Page v
 
-let router uri headers post =
+let router _uri _headers post =
   let h = Cohttp.Header.init_with "Content-Type" "text/html" in
   calc post (* TODO routing here *)
   >>! (function

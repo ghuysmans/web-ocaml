@@ -34,12 +34,12 @@ let map_s f =
 
 (* tests *)
 
-let transformed =
+let _transformed =
   return 42
   >|> (fun x -> 2*x)
   >|> string_of_int
 
-let different_errors =
+let _different_errors =
   return 42
-  >>> (fun x -> fail (`I 12))
-  >>> (fun x -> fail (`S "nok"))
+  >>> (fun _ -> fail (`I 12))
+  >>> (fun _ -> fail (`S "nok"))

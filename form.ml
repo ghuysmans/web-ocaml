@@ -141,8 +141,10 @@ let to_float x =
 
 open Tyxml.Html
 
-let input ?label (x, {name}) =
-  let value, err = match x with
+(* FIXME use label *)
+let input (x, {name}) =
+  (* FIXME display the error *)
+  let value, _err = match x with
     | Valid value -> value, None
     | Invalid (value, err) -> value, Some err in
   let rec output: type a. bool -> a typ -> _ = fun required -> function
