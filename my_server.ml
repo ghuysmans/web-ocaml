@@ -16,7 +16,7 @@ let create mode route =
     let uri = req |> Request.uri in
     let meth = req |> Request.meth in
     let headers = req |> Request.headers in
-    body |> Cohttp_lwt_body.to_string >>= fun body ->
+    body |> Cohttp_lwt.Body.to_string >>= fun body ->
     let post =
       if Code.compare_method meth `POST = 0 then
         Some (Uri.of_string ("//x/?" ^ body))
