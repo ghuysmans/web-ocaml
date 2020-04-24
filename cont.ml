@@ -1,6 +1,8 @@
+type res = (Tyxml.Html.doc, Cohttp.Code.status_code * string) result
+
 type 'a t =
   | Return of 'a
-  | Ask of (string -> Tyxml.Html.doc) * (Uri.t -> 'a t)
+  | Ask of (string -> res) * (Uri.t -> 'a t)
   | Await : 'b Lwt.t * ('b -> 'a t) -> 'a t
 
 let rec (>>=) t f =

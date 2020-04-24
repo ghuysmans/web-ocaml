@@ -1,4 +1,4 @@
-open Lwt
+open Lwt.Infix
 open Cohttp
 open Cohttp_lwt_unix
 
@@ -28,3 +28,51 @@ let create mode route =
 let respond_redirect uri headers path =
   let uri = Uri.with_path uri path in
   Server.respond_redirect ~headers ~uri ()
+
+type doc = Html_types.html Tyxml_html.elt
+type router = (unit -> Cont.res Cont.t) Routes.router
+
+let cont = Hashtbl.create 10
+
+let make router uri _headers post =
+  let t =
+    match post with
+    | None ->
+      (match Routes.match' router ~target:(Uri.path uri) with
+      | None -> Cont.return (Result.Error (`Not_found, "not found"))
+      | Some r -> r ())
+    | Some post ->
+      match Uri.get_query_param post "k" with
+      | None ->
+        Cont.return (Result.Error (`Bad_request, "missing k"))
+      | Some k ->
+        let k = int_of_string k in
+        match Hashtbl.find_opt cont k with
+        | None ->
+          Cont.return (Result.Error (`Gone, "bad k"))
+        | Some f ->
+          Hashtbl.remove cont k;
+          f post
+  in
+  let respond e =
+    let h = Cohttp.Header.init_with "Content-Type" "text/html" in
+    let code, doc =
+      match e with
+      | Ok doc -> `OK, doc
+      | Error (code, message) ->
+        let doc = Template.template "Error" [Tyxml.Html.txt message] in
+        code, doc
+    in
+    respond code h doc
+  in
+  let rec step = function
+    | Cont.Return doc -> respond doc
+    | Ask (render, f) ->
+      let id = Random.bits () in
+      Hashtbl.replace cont id f;
+      let url = string_of_int id in
+      respond (render url)
+    | Await (lwt, f) ->
+      lwt >>= fun x -> step (f x)
+  in
+  step t
