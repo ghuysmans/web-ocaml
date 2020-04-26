@@ -104,10 +104,21 @@ let list () =
     ];
   ])
 
+let stubs () =
+  !data |>
+  Cont.map (fun ({name; _} as t) ->
+    stub (fun () -> return @@ Result.Ok (Template.template "stub" [
+      pp t;
+    ])) >>= fun k ->
+    return @@ li [a ~a:[a_href k] [txt name]]
+  ) >>= fun l ->
+  return @@ Result.Ok (Template.template "list" [ul l])
+
 
 let router : My_server.router = Routes.(one_of [
   nil @--> index;
   s "add" /? nil @--> add;
   edit_r () @--> edit;
   s "list" /? nil @--> list;
+  s "stubs" /? nil @--> stubs;
 ])

@@ -12,3 +12,6 @@ val return : 'a -> 'a t
 val ask : (string -> res) -> Uri.t t
 val await : 'a Lwt.t -> 'a t
 val stub : (unit -> res t) -> string t
+
+val map : ('a -> 'b t) -> 'a list -> 'b list t
+val fold : ('a -> 'b -> 'a t) -> 'b list -> 'a t -> 'a t
