@@ -93,9 +93,13 @@ let add () =
 
 let list () =
   let id = Random.bits () in
-  let x = [txt ("comes from " ^ string_of_int id)] in
-  stub (fun () -> return @@ Result.Ok (Template.template "k" x)) >>= fun k ->
-  stub (fun () -> return @@ Result.Ok (Template.template "l" x)) >>= fun l ->
+  let make title () =
+    return @@ Result.Ok (Template.template title [
+      txt ("comes from " ^ string_of_int id);
+    ])
+  in
+  stub (make "k") >>= fun k ->
+  stub (make "l") >>= fun l ->
   return @@ Result.Ok (Template.template "list" [
     p [txt (string_of_int id)];
     ul [
