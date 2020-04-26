@@ -14,8 +14,8 @@ let default = {
 }
 
 let data = ref [
-  {name = "Guillaume"; age = 24; animals = ["Gizmo"]};
-  {name = "Charlotte"; age = 21; animals = ["Gizmo"; "Guillaume"]};
+  {name = "Alice"; age = 18; animals = ["fish"]};
+  {name = "Bob"; age = 19; animals = ["cat"; "donkey"]};
 ]
 
 let listbox _ = div [txt "TODO"]
@@ -91,8 +91,23 @@ let add () =
   data := t :: !data;
   return @@ Result.Ok (Template.template "new" [pp t])
 
+let list () =
+  let id = Random.bits () in
+  let x = [txt ("comes from " ^ string_of_int id)] in
+  stub (fun () -> return @@ Result.Ok (Template.template "k" x)) >>= fun k ->
+  stub (fun () -> return @@ Result.Ok (Template.template "l" x)) >>= fun l ->
+  return @@ Result.Ok (Template.template "list" [
+    p [txt (string_of_int id)];
+    ul [
+      li [a ~a:[a_href k] [txt "go to k"]];
+      li [a ~a:[a_href l] [txt "go to l"]];
+    ];
+  ])
+
+
 let router : My_server.router = Routes.(one_of [
   nil @--> index;
   s "add" /? nil @--> add;
   edit_r () @--> edit;
+  s "list" /? nil @--> list;
 ])
