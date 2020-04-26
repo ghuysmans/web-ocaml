@@ -1,2 +1,2 @@
 all:
-	dune build main.exe
+	dune build bin/main.exe
